@@ -37,3 +37,48 @@ end
 puts "Starting redis for testing at localhost:9736..."
 `redis-server #{dir}/redis-test.conf`
 Resque.redis = 'localhost:9736'
+
+
+#
+# job classes
+#
+class AllowedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
+  @queue = :timeframed_queue
+  def self.perform(args); end
+end
+
+class RestrictedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
+  timeframe :default => false
+
+  @queue = :timeframed_queue
+  def self.perform(args); end
+end
+
+class WorkingDaysTimeframeJob < Resque::Plugins::TimeframedJob
+  timeframe week - [:saturday, :sunday] => 0..9 # 24 hour format
+
+  @queue = :timeframed_queue
+  def self.perform(args); end
+end
+
+class DisabledDayTimeframeJob < Resque::Plugins::TimeframedJob
+  timeframe :sunday => true
+
+  @queue = :timeframed_queue
+  def self.perform(args); end
+end
+
+class RegularWeekRestrictionJob < Resque::Plugins::TimeframedJob
+  timeframe :monday     => 0..11    # 0 a.m. .. 11 a.m.
+  timeframe :tuesday    => 14..23   # 14 p.m. .. 23 p.m.
+  timeframe :wednesday  => 0..11
+  timeframe :thursday   => '9:30'..'11:30'
+  timeframe :friday     => 0..11
+  timeframe :saturday   => true
+  timeframe :sunday     => false
+
+  @queue = :timeframed_queue
+
+  def self.perform(args)
+  end
+end
