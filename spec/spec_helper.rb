@@ -73,7 +73,7 @@ class RegularWeekRestrictionJob < Resque::Plugins::TimeframedJob
   timeframe :tuesday    => 14..23   # 14 p.m. .. 23 p.m.
   timeframe :wednesday  => 0..11
   timeframe :thursday   => '9:30'..'11:30'
-  timeframe :friday     => 0..11
+  timeframe :friday     => '17:30'..'23:59'
   timeframe :saturday   => true
   timeframe :sunday     => false
 

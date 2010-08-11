@@ -38,6 +38,16 @@ describe Resque::Plugins::Timeframe do
     it "should be restrict if default set to false" do
       RestrictedByDefaultTimeframeJob.allowed_at?(:monday).should be_false
     end
+
+    it "should allow a job if exact time range specified" do
+      Time.stub!(:now).and_return(Time.parse("11:21"))
+      RegularWeekRestrictionJob.allowed_at?(:thursday).should be_true
+    end
+
+    it "should does not allow a job if exact time range specified but out of current time" do
+      Time.stub!(:now).and_return(Time.parse("11:21"))
+      RegularWeekRestrictionJob.allowed_at?(:friday).should be_false
+    end
   end
 
   context "Resque" do

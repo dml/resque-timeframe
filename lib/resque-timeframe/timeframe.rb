@@ -21,8 +21,6 @@ module Resque
       def allowed_at?(weekday, time = nil)
         case settings[weekday]
           when Range
-            range = [settings[weekday].begin, settings[weekday].end]
-            
             range(settings[weekday]).include?(Time.now)
           when FalseClass, TrueClass
             settings[weekday] && settings[:default]
