@@ -40,23 +40,37 @@ describe Resque::Plugins::Timeframe do
     end
 
     it "should allow a job if exact time range specified" do
-      Time.stub!(:now).and_return(Time.parse("11:21"))
+      @time = Time.mktime(2010, 8, 11, 11, 21, 00)
+      Time.stub!(:now).and_return(@time)
       RegularWeekRestrictionJob.allowed_at?(:thursday).should be_true
     end
 
     it "should does not allow a job if exact time range specified but out of current time" do
-      Time.stub!(:now).and_return(Time.parse("11:21"))
+      @time = Time.mktime(2010, 8, 11, 12, 33, 00)
+      Time.stub!(:now).and_return(@time)
       RegularWeekRestrictionJob.allowed_at?(:friday).should be_false
     end
   end
 
   context "Resque" do
-    before(:all) do
+    include PerformJob
+
+    before(:each) do
       Resque.redis.flushall
+      @time = Time.mktime(2010, 8, 11, 11, 59, 00)
+      Time.stub!(:now).and_return(@time)
     end
 
-    it "does something" do
-      true.should == true
+    it "should perform job if timeframe is allowed" do
+      AllowedByDefaultTimeframeJob.should_receive(:perform).and_return("OK")
+      result = perform_job(AllowedByDefaultTimeframeJob, 1)
+      result.should be_true
+    end
+
+    it "should not perform job if timeframe is restricted" do
+      RestrictedByDefaultTimeframeJob.should_not_receive(:perform)
+      result = perform_job(RestrictedByDefaultTimeframeJob, 1)
+      result.should be_false
     end
   end
 

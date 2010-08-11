@@ -18,7 +18,7 @@ module Resque
         settings.merge!(options)
       end
 
-      def allowed_at?(weekday, time = nil)
+      def allowed_at?(weekday)
         case settings[weekday]
           when Range
             range(settings[weekday]).include?(Time.now)
@@ -44,7 +44,7 @@ module Resque
       end
 
       def before_perform_timeframe(*args)
-        
+        raise Resque::Job::DontPerform unless allowed_at?(week[Time.new.wday])
       end
 
     end

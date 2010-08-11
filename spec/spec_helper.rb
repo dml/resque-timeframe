@@ -40,6 +40,16 @@ Resque.redis = 'localhost:9736'
 
 
 #
+# helper
+#
+module PerformJob
+  def perform_job(klass, *args)
+    resque_job = Resque::Job.new(:testqueue, 'class' => klass, 'args' => args)
+    resque_job.perform
+  end
+end
+
+#
 # job classes
 #
 class AllowedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
