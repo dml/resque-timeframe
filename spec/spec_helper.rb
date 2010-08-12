@@ -65,6 +65,7 @@ class RestrictedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
 end
 
 class WorkingDaysTimeframeJob < Resque::Plugins::TimeframedJob
+  timeframe :recurrent => 900
   timeframe week - [:saturday, :sunday] => 0..9 # 24 hour format
 
   @queue = :timeframed_queue
@@ -73,7 +74,7 @@ end
 
 class JunkTimeframeJob < Resque::Plugins::TimeframedJob
   timeframe :recurrent => false
-  timeframe week - [:saturday, :sunday] => 0..9 # 24 hour format
+  timeframe week - [:saturday, :sunday] => 0..9
 
   @queue = :timeframed_queue
   def self.perform(args); end

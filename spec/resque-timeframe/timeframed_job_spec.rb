@@ -2,6 +2,10 @@ require File.join(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Resque::Plugins::Timeframe do
 
+  before(:all) do
+    @monday = Time.mktime(2010, 8, 9, 00, 00, 00)
+  end
+
   context "Convention" do
     it "should follow the convention" do
       lambda {
@@ -122,13 +126,13 @@ describe Resque::Plugins::Timeframe do
     end
 
     it "should allow a job if exact time range specified" do
-      @time = Time.mktime(2010, 8, 11, 11, 21, 00)
+      @time = @monday + (60*60 * 24 * 4) + (60*60 * 11) + (60 * 21) # 11:21 @ thursday
       Time.stub!(:now).and_return(@time)
       RegularWeekRestrictionJob.allowed_at?(:thursday).should be_true
     end
 
     it "should does not allow a job if exact time range specified but out of current time" do
-      @time = Time.mktime(2010, 8, 11, 12, 33, 00)
+      @time = @monday + (60*60 * 24 * 5) + (60*60 * 12) + (60 * 33) # 12:33 @ friday
       Time.stub!(:now).and_return(@time)
       RegularWeekRestrictionJob.allowed_at?(:friday).should be_false
     end
@@ -139,7 +143,7 @@ describe Resque::Plugins::Timeframe do
 
     before(:each) do
       Resque.redis.flushall
-      @time = Time.mktime(2010, 8, 11, 11, 59, 00)
+      @time = @monday + (60*60 * 24 * 4) + (60*60 * 11) + (60 * 59) # 11:59 @ thursday
       Time.stub!(:now).and_return(@time)
     end
 
@@ -157,6 +161,23 @@ describe Resque::Plugins::Timeframe do
 
     it "should delay job on a minute if job is out of timeframe" do
       RestrictedByDefaultTimeframeJob.should_not_receive(:perform)
+      Resque.should_receive(:enqueue_in).with(60, RestrictedByDefaultTimeframeJob, 1)
+      result = perform_job(RestrictedByDefaultTimeframeJob, 1)
+      result.should be_false
+    end
+
+    it "should delay job on custom period if job is out of timeframe" do
+      WorkingDaysTimeframeJob.should_not_receive(:perform)
+      Resque.should_receive(:enqueue_in).with(900, WorkingDaysTimeframeJob, 1)
+      result = perform_job(WorkingDaysTimeframeJob, 1)
+      result.should be_false
+    end
+
+    it "should not perform and remove job if :reccurent is false" do
+      JunkTimeframeJob.should_not_receive(:perform)
+      Resque.should_not_receive(:enqueue_in)
+      result = perform_job(JunkTimeframeJob, 1)
+      result.should be_false
     end
   end
 

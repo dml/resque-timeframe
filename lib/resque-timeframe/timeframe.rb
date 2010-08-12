@@ -64,7 +64,7 @@ module Resque
 
       def before_perform_timeframe(*args)
         unless allowed_at?(week[Time.new.wday])
-          Resque.enqueue_in(settings[:recurrent], self, *args)
+          Resque.enqueue_in(settings[:recurrent], self, *args) if settings[:recurrent]
 
           raise Resque::Job::DontPerform
         end
