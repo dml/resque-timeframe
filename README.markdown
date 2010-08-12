@@ -50,8 +50,34 @@ or like this
 
     @queue = :timeframed_queue
 
-    def self.perform(args)
-    end
+    def self.perform(args); end
+  end
+
+  class ArchiveJob < Resque::Plugins::TimeframedJob
+    timeframe week - [:saturday, :sunday] => 0..9
+
+    @queue = :timeframed_queue
+
+    def self.perform(args); end
+  end
+
+
+All timeframed jobs would be delayed in 60 seconds if job out of timeframe. Delay could be configured of set to false. If delay set to false all jobs would be removed from queue.
+
+  class Job < Resque::Plugins::TimeframedJob
+    timeframe :recurrent => 900 # in seconds
+
+    @queue = :timeframed_queue
+    def self.perform(args); end
+  end
+
+or
+
+  class HaveAChanceJob < Resque::Plugins::TimeframedJob
+    timeframe :recurrent => false
+
+    @queue = :timeframed_queue
+    def self.perform(args); end
   end
 
 
@@ -67,3 +93,4 @@ Copyright (c) 2010 Dmitry Larkin (at [Railsware][3] for [Ratepoint][4])
 [2]: http://github.com/dml/resque-timeframe/issues
 [3]: http://railsware.com
 [4]: http://ratepoint.com
+[5]: http://github.com/bvandenbos/resque-scheduler
