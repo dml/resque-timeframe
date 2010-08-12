@@ -30,6 +30,88 @@ describe Resque::Plugins::Timeframe do
     end
   end
 
+  context "Timeframe" do
+    before(:all) do
+      @klass = Class.new
+      @klass.extend Resque::Plugins::Timeframe
+    end
+
+    it "should have defined weeks" do
+      @klass.week.should be_kind_of(Array)
+    end
+
+    it "should have defined settings" do
+      @klass.settings.should be_kind_of(Hash)
+    end
+
+    it "should default true for a weeks days" do
+      @klass.week.each do |dayoweek|
+        @klass.settings[dayoweek].should be_true
+      end
+    end
+
+    context "defining a day timeframe" do
+      before(:each) do
+        @day_of_week = :monday
+        @period = 2..11
+        @klass.timeframe @day_of_week => @period
+      end
+
+      it "should set one day settings" do
+        @klass.settings[@day_of_week].should == @period
+      end
+
+      it "should not affect other day settings" do
+        (@klass.week - [:monday]).each do |dayoweek|
+          @klass.settings[dayoweek].should be_true
+        end
+      end
+    end
+
+    context "defining few days timeframes" do
+      before(:each) do
+        @days_of_week = [:monday, :wednesday, :friday]
+        @period = 7..19
+        @klass.timeframe @days_of_week => @period
+      end
+
+      it "should set one day settings" do
+        @days_of_week.each do |dayoweek|
+          @klass.settings[dayoweek].should == @period
+        end
+      end
+
+      it "should not affect other day settings" do
+        (@klass.week - @days_of_week).each do |dayoweek|
+          @klass.settings[dayoweek].should be_true
+        end
+      end
+    end
+
+    context "defining few days timeframes" do
+      before(:each) do
+        @days_of_week1 = [:monday, :wednesday]
+        @day_of_week2 = :friday
+        @period1 = 7..19
+        @period2 = 3..16
+        @klass.timeframe @days_of_week1 => @period1, @day_of_week2 => @period2
+      end
+
+      it "should set one day settings" do
+        @days_of_week1.each do |dayoweek|
+          @klass.settings[dayoweek].should == @period1
+        end
+        @klass.settings[@day_of_week2].should == @period2
+      end
+
+      it "should not affect other day settings" do
+        (@klass.week - @days_of_week1 - [@day_of_week2]).each do |dayoweek|
+          @klass.settings[dayoweek].should be_true
+        end
+      end
+    end
+  end
+
   context "Settings" do
     it "should allowed by default" do
       AllowedByDefaultTimeframeJob.allowed_at?(:monday).should be_true
@@ -71,6 +153,10 @@ describe Resque::Plugins::Timeframe do
       RestrictedByDefaultTimeframeJob.should_not_receive(:perform)
       result = perform_job(RestrictedByDefaultTimeframeJob, 1)
       result.should be_false
+    end
+
+    it "should delay job on a minute if job is out of timeframe" do
+      RestrictedByDefaultTimeframeJob.should_not_receive(:perform)
     end
   end
 

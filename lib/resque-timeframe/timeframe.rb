@@ -11,11 +11,22 @@ module Resque
       end
 
       def settings
-        @options ||= WEEK.inject({:default => true}) {|c,v| c.merge({v => true})}
+        @options ||= WEEK.inject({:default => true, :recurrent => 60}) {|c,v| c.merge({v => true})}
       end
 
-      def timeframe(options={})
-        settings.merge!(options)
+      def timeframe(options = {})
+        options.map do |param,value|
+          case param
+            when Array
+              param.map {|k| timeframe({k => value}) }
+            when String
+              timeframe({param.to_sym => value})
+            when Symbol
+              settings.merge!({param => value})
+            else
+              # 
+          end
+        end
       end
 
       def allowed_at?(weekday)
@@ -52,7 +63,11 @@ module Resque
       end
 
       def before_perform_timeframe(*args)
-        raise Resque::Job::DontPerform unless allowed_at?(week[Time.new.wday])
+        unless allowed_at?(week[Time.new.wday])
+          Resque.enqueue_in(settings[:recurrent], self, *args)
+
+          raise Resque::Job::DontPerform
+        end
       end
 
     end

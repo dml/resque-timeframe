@@ -71,6 +71,14 @@ class WorkingDaysTimeframeJob < Resque::Plugins::TimeframedJob
   def self.perform(args); end
 end
 
+class JunkTimeframeJob < Resque::Plugins::TimeframedJob
+  timeframe :recurrent => false
+  timeframe week - [:saturday, :sunday] => 0..9 # 24 hour format
+
+  @queue = :timeframed_queue
+  def self.perform(args); end
+end
+
 class DisabledDayTimeframeJob < Resque::Plugins::TimeframedJob
   timeframe :sunday => true
 

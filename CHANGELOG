@@ -1,3 +1,8 @@
+## 0.2.0 (2010-08-12)
+
++ Job Delay if it out of timeframe.
++ Imroved timeframe function
+
 ## 0.1.0 (2010-08-11)
 
 * First release.
