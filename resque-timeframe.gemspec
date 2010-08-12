@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.author = 'Dmitry Larkin'
   spec.email = 'dmitry.larkin@gmail.com'
-  spec.homepage = 'http://www.railsware.com'
+  spec.homepage = 'http://github.com/dml/resque-timeframe'
 
   spec.rubyforge_project = nil
   spec.has_rdoc = true

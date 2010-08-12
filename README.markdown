@@ -58,7 +58,7 @@ or like this
 
 Copyright
 ---------
-Copyright (c) 2010 Dmitry Larkin (at [Railsware][3])
+Copyright (c) 2010 Dmitry Larkin (at [Railsware][3] for [Ratepoint][4])
 
 
 
@@ -66,3 +66,4 @@ Copyright (c) 2010 Dmitry Larkin (at [Railsware][3])
 [1]: http://help.github.com/forking/
 [2]: http://github.com/dml/resque-timeframe/issues
 [3]: http://railsware.com
+[4]: http://ratepoint.com
