@@ -29,17 +29,25 @@ module Resque
         end
       end
 
+      def time_at(hr)
+        t = Time.now
+        if (0..23).include?(hr)
+          Time.mktime(t.year, t.month, t.day, hr, 0, 0)
+        else
+          Time.mktime(t.year, t.month, t.day + 1, 0, 0, 0)
+        end
+      end
+
       def range(date_range)
         case date_range.begin
           when Integer
-            time_at = lambda {|hr| Time.mktime(Time.new.year, Time.new.month, Time.new.day, hr, 0, 0)} 
-            time_at.call(date_range.begin)..time_at.call(date_range.end)
+            time_at(date_range.begin)..time_at(date_range.end)
           when String
             Time.parse(date_range.begin)..Time.parse(date_range.end)
           when Time
             date_range
           else
-            Time.parse("00:00")..Time.parse("23:59")
+            time_at(0)..time_at(24)
         end
       end
 
