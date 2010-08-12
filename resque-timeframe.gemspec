@@ -16,21 +16,21 @@ Gem::Specification.new do |spec|
   spec.rubyforge_project = nil
   spec.has_rdoc = true
   spec.rdoc_options = ['--main', 'README.rdoc', '--charset=UTF-8']
-  spec.extra_rdoc_files = ['README.rdoc', 'LICENSE', 'CHANGELOG.rdoc']
+  spec.extra_rdoc_files = ['README.markdown', 'LICENSE', 'CHANGELOG']
   spec.rubygems_version = %q{1.3.6}
 
   spec.files = Dir['Rakefile', '{lib,spec}/**/*', 'README*', 'LICENSE*'] & `git ls-files -z`.split("\0")
 
-  if s.respond_to? :specification_version then
+  if spec.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
+    spec.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<resque>, [">= 1.7.0"])
+      spec.add_runtime_dependency(%q<resque>, [">= 1.7.0"])
     else
-      s.add_dependency(%q<resque>, [">= 1.7.0"])
+      spec.add_dependency(%q<resque>, [">= 1.7.0"])
     end
   else
-    s.add_dependency(%q<resque>, [">= 1.7.0"])
+    spec.add_dependency(%q<resque>, [">= 1.7.0"])
   end
 end
