@@ -29,11 +29,11 @@ To define timeframe possible to using week day name
 
   class ArchiveJob < Resque::Plugins::TimeframedJob
     timeframe :monday     => false            # do not allow execution at Monday
-    timeframe :tuesday    => 14..23           # 14 p.m. .. 23 p.m.
-    timeframe :wednesday  => 0..11
+    timeframe :tuesday    => 14..22           # from 14 p.m. till 22 p.m.
+    timeframe :wednesday  => 0..24            # full day
     timeframe :thursday   => '9:30'..'11:30'  # 24-hours format able to be parsed like Time.parse("23:59")
     timeframe :friday     => '17:30'..'23:59' 
-    timeframe :saturday   => true
+    timeframe :saturday   => true             # same as 0..24
     timeframe :sunday     => true
 
     @queue = :timeframed_queue
