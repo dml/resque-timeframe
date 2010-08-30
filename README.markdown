@@ -7,78 +7,82 @@ For example, archive operation could be run at any time excluding prime time. It
 
 Resque Timeframe requires Resque 1.7.0.
 
+
+
 Install
 -------
 
-  sudo gem install resque-timeframe
+    sudo gem install resque-timeframe
+
+
 
 To use
 ------
 
 Simpliest Timeframed job works like a regular job there each day of week allowed by default
 
-  class AllowedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
-    timeframe :default => true # deafult value
+    class AllowedByDefaultTimeframeJob < Resque::Plugins::TimeframedJob
+      timeframe :default => true # deafult value
 
-    @queue = :timeframed_queue
+      @queue = :timeframed_queue
 
-    def self.perform(args); end
-  end
+      def self.perform(args); end
+    end
 
 To define timeframe possible to using week day name
 
-  class ArchiveJob < Resque::Plugins::TimeframedJob
-    timeframe :monday     => false            # do not allow execution at Monday
-    timeframe :tuesday    => 14..22           # from 14 p.m. till 22 p.m.
-    timeframe :wednesday  => 0..24            # full day
-    timeframe :thursday   => '9:30'..'11:30'  # 24-hours format able to be parsed like Time.parse("23:59")
-    timeframe :friday     => '17:30'..'23:59' 
-    timeframe :saturday   => true             # same as 0..24
-    timeframe :sunday     => true
+    class ArchiveJob < Resque::Plugins::TimeframedJob
+      timeframe :monday     => false            # do not allow execution at Monday
+      timeframe :tuesday    => 14..22           # from 14 p.m. till 22 p.m.
+      timeframe :wednesday  => 0..24            # full day
+      timeframe :thursday   => '9:30'..'11:30'  # 24-hours format able to be parsed like Time.parse("23:59")
+      timeframe :friday     => '17:30'..'23:59' 
+      timeframe :saturday   => true             # same as 0..24
+      timeframe :sunday     => true
 
-    @queue = :timeframed_queue
+      @queue = :timeframed_queue
 
-    def self.perform(args)
+      def self.perform(args)
+      end
     end
-  end
 
 or like this
 
-  class ArchiveJob < Resque::Plugins::TimeframedJob
-    timeframe :default => false
-    timeframe [:saturday, :sunday] => true    # allow execution only at weekends
+    class ArchiveJob < Resque::Plugins::TimeframedJob
+      timeframe :default => false
+      timeframe [:saturday, :sunday] => true    # allow execution only at weekends
 
-    @queue = :timeframed_queue
+      @queue = :timeframed_queue
 
-    def self.perform(args); end
-  end
+      def self.perform(args); end
+    end
 
-  class ArchiveJob < Resque::Plugins::TimeframedJob
-    timeframe week - [:saturday, :sunday] => 0..9
+    class ArchiveJob < Resque::Plugins::TimeframedJob
+      timeframe week - [:saturday, :sunday] => 0..9
 
-    @queue = :timeframed_queue
+      @queue = :timeframed_queue
 
-    def self.perform(args); end
-  end
+      def self.perform(args); end
+    end
 
 
 All timeframed jobs would be delayed in 60 seconds if job out of timeframe. Delay could be configured of set to false. If delay set to false all jobs would be removed from queue.
 
-  class Job < Resque::Plugins::TimeframedJob
-    timeframe :recurrent => 900 # in seconds
+    class Job < Resque::Plugins::TimeframedJob
+      timeframe :recurrent => 900 # in seconds
 
-    @queue = :timeframed_queue
-    def self.perform(args); end
-  end
+      @queue = :timeframed_queue
+      def self.perform(args); end
+    end
 
 or
 
-  class HaveAChanceJob < Resque::Plugins::TimeframedJob
-    timeframe :recurrent => false
+    class HaveAChanceJob < Resque::Plugins::TimeframedJob
+      timeframe :recurrent => false
 
-    @queue = :timeframed_queue
-    def self.perform(args); end
-  end
+      @queue = :timeframed_queue
+      def self.perform(args); end
+    end
 
 
 
